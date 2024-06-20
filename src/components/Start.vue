@@ -7,10 +7,51 @@
 			<button v-if="ENQUETEUR" @click="next" class="btn-next">Suivant</button>
 		</div>
 
-		<div>
+		<div v-if="level === 1">
+			<h2>
+				Bonjour,<br><br> la Métropole de Nancy souhaiterait connaître les habitudes de déplacement des
+				spectateurs,
+				<br><br>lors
+				des
+				événements au Zénith. <br><br>
+				Accepteriez-vous de répondre à 3 questions ?
+			</h2>
 			<button @click="startSurvey" class="btn-next">COMMENCER QUESTIONNAIRE</button>
 		</div>
-		<div>
+
+		<div id="q1" v-if="level === 2">
+			<h2>Quel est le mode de transport que vous avez utilisé pour venir ici ?</h2>
+			<select v-model="Q1" class="form-control">
+				<option v-for="option in q1" :key="option.id" :value="option.output">
+					{{ option.text }}
+				</option>
+			</select>
+			<input v-if="Q1 === 9" class="form-control" type="text" v-model="Q1_DETAIL" placeholder="Precisions">
+			<button v-if="Q1" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+
+		<div id="q2" v-if="level === 3">
+			<h2>Si vous êtes venus en voiture, où êtes-vous stationnés ? </h2>
+			<select v-model="Q2" class="form-control">
+				<option v-for="option in q2" :key="option.id" :value="option.output">
+					{{ option.text }}
+				</option>
+			</select>
+			<input v-if="Q2 === 7" class="form-control" type="text" v-model="Q2_DETAIL" placeholder="Precisions">
+			<button v-if="Q2" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+
+		<div id="q3" v-if="level === 4">
+			<h2>Si vous êtes venus en voiture, vous êtes venus à combien ?</h2>
+			<input class="form-control" type="text" v-model="Q3" placeholder="Precisions">
+			<button v-if="Q3" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+
+		<div v-if="level === 5">
+			<h2>Merci et bon concert !</h2>
 			<button @click="submitSurvey" class="btn-next">FINIR QUESTIONNAIRE</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
@@ -26,7 +67,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { } from "./reponses";
+import { q1, q2 } from "./reponses";
 import GareSelector from "./GareSelector.vue";
 import CommuneSelector from './CommuneSelector.vue';
 import { db } from "../firebaseConfig";
@@ -34,10 +75,16 @@ import { collection, getDocs, addDoc } from "firebase/firestore";
 import * as XLSX from "xlsx";
 
 const docCount = ref(0);
-const surveyCollectionRef = collection(db, "REF");
+const surveyCollectionRef = collection(db, "Nancy");
 const level = ref(0);
 const startDate = ref('');
 const ENQUETEUR = ref('');
+const Q1 = ref('');
+const Q1_DETAIL = ref('');
+const Q2 = ref('');
+const Q2_DETAIL = ref('');
+const Q3 = ref('');
+
 
 
 
@@ -75,10 +122,20 @@ const submitSurvey = async () => {
 		JOUR: new Date().toLocaleDateString("fr-FR", { weekday: 'long' }),
 		ENQUETEUR: ENQUETEUR.value,
 		HEURE_FIN: new Date().toLocaleTimeString("fr-FR").slice(0, 8),
+		Q1: Q1.value,
+		Q1_DETAIL: Q1_DETAIL.value,
+		Q2: Q2.value,
+		Q2_DETAIL: Q2_DETAIL.value,
+		Q3: Q3.value,
 
 	});
 	level.value = 1;
 	startDate.value = "";
+	Q1.value = "";
+	Q1_DETAIL.value = "";
+	Q2.value = "";
+	Q2_DETAIL.value = "";
+	Q3.value = "";
 	getDocCount();
 };
 
@@ -96,6 +153,11 @@ const downloadData = async () => {
 			JOUR: "JOUR",
 			HEURE_DEBUT: "HEURE_DEBUT",
 			HEURE_FIN: "HEURE_FIN",
+			Q1: "Q1",
+			Q1_DETAIL: "Q1_DETAIL",
+			Q2: "Q2",
+			Q2_DETAIL: "Q2_DETAIL",
+			Q3: "Q3",
 		};
 
 		// Initialize maxWidths with header lengths
@@ -112,6 +174,11 @@ const downloadData = async () => {
 				JOUR: docData.JOUR || "",
 				HEURE_DEBUT: docData.HEURE_DEBUT || "",
 				HEURE_FIN: docData.HEURE_FIN || "",
+				Q1: docData.Q1 || "",
+				Q1_DETAIL: docData.Q1_DETAIL || "",
+				Q2: docData.Q2 || "",
+				Q2_DETAIL: docData.Q2_DETAIL || "",
+				Q3: docData.Q3 || "",
 			};
 			data.push(mappedData);
 			// Update maxWidths for each key in mappedData
@@ -132,7 +199,7 @@ const downloadData = async () => {
 		const workbook = XLSX.utils.book_new();
 		XLSX.utils.book_append_sheet(workbook, worksheet, "Data"); ``
 		// Export the workbook to a .xlsx file
-		XLSX.writeFile(workbook, "Autocar.xlsx");
+		XLSX.writeFile(workbook, "Nancy.xlsx");
 	} catch (error) {
 		console.error("Error downloading data: ", error);
 	}
