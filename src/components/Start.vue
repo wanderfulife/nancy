@@ -17,6 +17,10 @@
 				Accepteriez-vous de répondre à 3 questions ?
 			</h2>
 			<button @click="startSurvey" class="btn-next">COMMENCER QUESTIONNAIRE</button>
+			<br>
+			<div class="map-container">
+				<img :src="mapSrc" alt="Map Image" class="map-image" />
+			</div>
 		</div>
 
 		<div id="q1" v-if="level === 2">
@@ -55,6 +59,7 @@
 			<button @click="submitSurvey" class="btn-next">FINIR QUESTIONNAIRE</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
+
 		<img class="logo" src="../assets/Alycelogo.webp" alt="Logo Alyce">
 
 		<button class="btn-fin" @click="downloadData">download DATA</button>
@@ -73,7 +78,9 @@ import CommuneSelector from './CommuneSelector.vue';
 import { db } from "../firebaseConfig";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import * as XLSX from "xlsx";
+import mapImage from '../assets/zenith.jpg';
 
+const mapSrc = ref(mapImage);
 const docCount = ref(0);
 const surveyCollectionRef = collection(db, "Nancy");
 const level = ref(0);
@@ -86,7 +93,9 @@ const Q2_DETAIL = ref('');
 const Q3 = ref('');
 
 
-
+const openImage = () => {
+	window.open(mapSrc.value, '_blank');
+};
 
 const startSurvey = () => {
 	startDate.value = new Date().toLocaleTimeString("fr-FR").slice(0, 8);
@@ -208,6 +217,39 @@ const downloadData = async () => {
 </script>
 
 <style>
+.map-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 50vh;
+	/* Adjust the height as needed */
+	padding-top: 10%;
+	box-sizing: border-box;
+}
+
+.map-image {
+	max-width: 50%;
+	height: auto;
+	cursor: pointer;
+	border: 2px solid #ccc;
+	border-radius: 8px;
+	transition: transform 0.3s ease;
+}
+
+.map-image:hover {
+	transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+	.map-container {
+		height: auto;
+	}
+
+	.map-image {
+		width: 100%;
+		height: auto;
+	}
+}
 body {
 	background-color: #2a3b63;
 }
