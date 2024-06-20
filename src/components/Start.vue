@@ -35,7 +35,7 @@
 			<button @click="back" class="btn-return">retour</button>
 		</div>
 
-		<div id="q2" v-if="level === 3">
+		<div id="q2" v-if="level === 3 && (Q1 === 2 || Q1 === 3)">
 			<h2>Si vous êtes venus en voiture, où êtes-vous stationnés ? </h2>
 			<select v-model="Q2" class="form-control">
 				<option v-for="option in q2" :key="option.id" :value="option.output">
@@ -47,14 +47,15 @@
 			<button @click="back" class="btn-return">retour</button>
 		</div>
 
-		<div id="q3" v-if="level === 4">
+		<div id="q3" v-if="level === 4 && (Q1 === 2 || Q1 === 3)">
 			<h2>Si vous êtes venus en voiture, vous êtes venus à combien ?</h2>
 			<input class="form-control" type="text" v-model="Q3" placeholder="Precisions">
 			<button v-if="Q3" @click="next" class="btn-next">Suivant</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
 
-		<div v-if="level === 5">
+		<div
+			v-if="(level === 3 && (Q1 === 1 || Q1 === 4 || Q1 === 5 || Q1 === 6 || Q1 === 7 || Q1 === 8 || Q1 === 9)) || (level === 5 && (Q1 === 2 || Q1 === 3))">
 			<h2>Merci et bon concert !</h2>
 			<button @click="submitSurvey" class="btn-next">FINIR QUESTIONNAIRE</button>
 			<button @click="back" class="btn-return">retour</button>
